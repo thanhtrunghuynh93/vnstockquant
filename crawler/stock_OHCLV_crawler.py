@@ -31,6 +31,17 @@ def parse_args():
 
     return parser.parse_args()
 
+def load_data_direct(ticker, exchange = "HOSE", interval = "1W", nbars = 5000):
+    username = 'thanhtrunghuynh93'
+    password = '@Manutd93@'
+    crawler=TvDatafeed(username, password, chromedriver_path="chromedriver")
+    if interval == "1D":
+        df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_daily, n_bars = nbars)
+    if interval == "1W":
+        df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_weekly, n_bars = nbars)
+    df["ticker"] = ticker
+    return df
+
 def crawl(stock_infos, stock_list, output_dir, crawl_new, interval, crawl_source, args):
 
     if interval == "1hour":
