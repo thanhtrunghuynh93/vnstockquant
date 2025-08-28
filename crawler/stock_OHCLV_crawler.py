@@ -39,6 +39,8 @@ def load_data_direct(ticker, exchange = "HOSE", interval = "1W", nbars = 5000):
         df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_daily, n_bars = nbars)
     if interval == "1W":
         df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_weekly, n_bars = nbars)
+    if df is None:
+        raise ValueError("No data found")
     df["ticker"] = ticker
     return df
 
