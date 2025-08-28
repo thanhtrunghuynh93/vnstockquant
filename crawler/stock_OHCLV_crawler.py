@@ -56,7 +56,7 @@ def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, live =
     df = load_data_direct(ticker, exchange, interval, nbars)
     if live:
         quote = Quote(symbol='ACB', source='VCI')
-        last_price = quote.intraday(page_size = 1)["price"].values[-1]
+        last_price = quote.intraday(page_size = 1)["price"].values[-1] * 1000
         df.loc[df.index[-1], 'close'] = last_price
 
     return df
