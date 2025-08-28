@@ -7,6 +7,7 @@ from datetime import datetime
 from pytz import timezone
 from pathlib import Path
 import numpy as np
+from vnstock import Quote
 
 def parse_args():
     parser = argparse.ArgumentParser(description="crawler")
@@ -51,8 +52,14 @@ def load_data_direct(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, m
                 raise
             time.sleep(1)
 
-def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, max_retries=3):
-    return load_data_direct(ticker, exchange, interval, nbars)
+def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, live = True):
+    df = load_data_direct(ticker, exchange, interval, nbars)
+    if live:
+        quote = Quote(symbol='ACB', source='VCI')
+        last_price = quote.intraday(page_size = 1)["price"].values[-1]
+        df.loc[df.index[-1], 'close'] = last_price
+
+    return df
     
 # def crawl(stock_infos, stock_list, output_dir, crawl_new, interval, crawl_source, args):
 
