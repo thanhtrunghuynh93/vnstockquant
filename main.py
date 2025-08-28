@@ -47,7 +47,7 @@ def main():
 
                 for stock in stock_momentum_list:
                     df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
-                    msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
+                    msg += f"\n{stock}: {int(df['close'].values[-1])} ({df['close'].pct_change().values[-1]*100:.2f}%)"
                     change += df['close'].pct_change().values[-1]*100
 
                 msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
@@ -58,7 +58,7 @@ def main():
 
                 for stock in next_stock_momentum_list:
                     df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
-                    msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
+                    msg += f"\n{stock}: {int(df['close'].values[-1])} ({df['close'].pct_change().values[-1]*100:.2f}%)"
                     change += df['close'].pct_change().values[-1]*100
 
                 msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
