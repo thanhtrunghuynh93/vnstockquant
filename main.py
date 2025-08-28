@@ -39,31 +39,32 @@ def main():
             send_notification(f"Weekly momentum list updated: {', '.join(stock_momentum_list)}")
             current_weekday = now.tm_wday                                    
         else:
-            res = is_trading_hour(now)        
-            stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
-            msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]:{res}\n Current weekly momentum list: {', '.join(stock_momentum_list)}"
-            change = 0
+            res = is_trading_hour(now)      
+            if res:  
+                stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
+                msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]\n Current weekly momentum list: {', '.join(stock_momentum_list)}"
+                change = 0
 
-            for stock in stock_momentum_list:
-                df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
-                msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
-                change += df['close'].pct_change().values[-1]*100
+                for stock in stock_momentum_list:
+                    df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
+                    msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
+                    change += df['close'].pct_change().values[-1]*100
 
-            msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
+                msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
 
-            next_stock_momentum_list = calculate_momentum(stock_1w_data, in_week=False)[:8]
-            msg += f"\nExpected next weekly stock momentum list: {', '.join(next_stock_momentum_list)}"
-            change = 0
+                next_stock_momentum_list = calculate_momentum(stock_1w_data, in_week=False)[:8]
+                msg += f"\nExpected next weekly stock momentum list: {', '.join(next_stock_momentum_list)}"
+                change = 0
 
-            for stock in next_stock_momentum_list:
-                df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
-                msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
-                change += df['close'].pct_change().values[-1]*100
+                for stock in next_stock_momentum_list:
+                    df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
+                    msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
+                    change += df['close'].pct_change().values[-1]*100
 
-            msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
+                msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
 
-            send_notification(msg)
-            time.sleep(60)
+                send_notification(msg)
+                time.sleep(60)
 
             
 
