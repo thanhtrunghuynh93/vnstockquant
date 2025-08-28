@@ -17,11 +17,11 @@ def main():
     print("Waiting for the start of the day to retrieve stock metadata...")
     while True:
         now = time.localtime()
-        if now.tm_mday != current_day:
-            print(f"New day detected: {current_day}. Resetting stock metadata retrieval.")
-            stock_df = get_stock_metadata()
-            print("Stock metadata retrieval completed.")
-            current_day = now.tm_mday            
+        # if now.tm_mday != current_day:
+        #     print(f"New day detected: {current_day}. Resetting stock metadata retrieval.")
+        #     stock_df = get_stock_metadata()
+        #     print("Stock metadata retrieval completed.")
+        #     current_day = now.tm_mday            
         
         # Detect start of a new week (Monday)
         if current_weekday == -1 or (now.tm_wday == 0 and now.tm_wday != current_weekday):
@@ -37,9 +37,7 @@ def main():
             np.savetxt("data/momentum_list.txt", np.array(stock_momentum_list), fmt="%s")             
 
             send_notification(f"Weekly stock momentum list updated: {', '.join(stock_momentum_list)}")
-            current_weekday = now.tm_wday                        
-            # Place your weekly task here   
-            # 
+            current_weekday = now.tm_wday                                    
         else:
             res = is_trading_hour(now)        
             stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
