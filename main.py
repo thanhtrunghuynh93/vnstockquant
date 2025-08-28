@@ -52,7 +52,7 @@ def main():
             msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
 
             next_stock_momentum_list = calculate_momentum(stock_1w_data, in_week=False)[:8]
-            msg = f"\n Expected next weekly stock momentum list: {', '.join(next_stock_momentum_list)}"
+            msg += f"\nExpected next weekly stock momentum list: {', '.join(next_stock_momentum_list)}"
             change = 0
 
             for stock in next_stock_momentum_list:
