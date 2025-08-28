@@ -17,11 +17,11 @@ def main():
     print("Waiting for the start of the day to retrieve stock metadata...")
     while True:
         now = time.localtime()
-        # if now.tm_mday != current_day:
-        #     print(f"New day detected: {current_day}. Resetting stock metadata retrieval.")
-        #     stock_df = get_stock_metadata()
-        #     print("Stock metadata retrieval completed.")
-        #     current_day = now.tm_mday            
+        if now.tm_mday != current_day:
+            print(f"New day detected: {current_day}. Resetting stock metadata retrieval.")
+            stock_df = get_stock_metadata()
+            print("Stock metadata retrieval completed.")
+            current_day = now.tm_mday            
         
         # Detect start of a new week (Monday)
         if current_weekday == -1 or (now.tm_wday == 0 and now.tm_wday != current_weekday):
@@ -36,12 +36,12 @@ def main():
 
             np.savetxt("data/momentum_list.txt", np.array(stock_momentum_list), fmt="%s")             
 
-            send_notification(f"Weekly stock momentum list updated: {', '.join(stock_momentum_list)}")
+            send_notification(f"Weekly momentum list updated: {', '.join(stock_momentum_list)}")
             current_weekday = now.tm_wday                                    
         else:
             res = is_trading_hour(now)        
             stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
-            msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]:{res}\n Current weekly stock momentum list: {', '.join(stock_momentum_list)}"
+            msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]:{res}\n Current weekly momentum list: {', '.join(stock_momentum_list)}"
             change = 0
 
             for stock in stock_momentum_list:
@@ -50,6 +50,18 @@ def main():
                 change += df['close'].pct_change().values[-1]*100
 
             msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
+
+            next_stock_momentum_list = calculate_momentum(stock_1w_data, in_week=False)[:8]
+            msg = f"\n Expected next weekly stock momentum list: {', '.join(next_stock_momentum_list)}"
+            change = 0
+
+            for stock in next_stock_momentum_list:
+                df = load_data_direct(stock, interval="1W", exchange="HOSE", nbars=3)
+                msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
+                change += df['close'].pct_change().values[-1]*100
+
+            msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
+
             send_notification(msg)
             time.sleep(60)
 
