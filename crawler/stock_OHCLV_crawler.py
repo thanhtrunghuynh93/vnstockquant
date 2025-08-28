@@ -31,29 +31,29 @@ def parse_args():
 
     return parser.parse_args()
 
-def load_data_direct(ticker, exchange = "HOSE", interval = "1W", nbars = 5000):
+def load_data_direct(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, max_retries=3):
     username = 'thanhtrunghuynh93'
     password = '@Manutd93@'
     crawler=TvDatafeed(username, password, chromedriver_path="chromedriver")
-    if interval == "1D":
-        df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_daily, n_bars = nbars)
-    if interval == "1W":
-        df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_weekly, n_bars = nbars)
-    if df is None:
-        raise ValueError("No data found")
-    df["ticker"] = ticker
-    return df
-
-def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, max_retries=3):
     for attempt in range(max_retries):
         try:
-            return load_data_direct(ticker, exchange, interval, nbars)
+            if interval == "1D":
+                df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_daily, n_bars = nbars)
+            if interval == "1W":
+                df = crawler.get_hist(symbol=ticker,exchange=exchange,interval=Interval.in_weekly, n_bars = nbars)
+            if df is None:
+                raise ValueError("No data found")
+            df["ticker"] = ticker
+            return df        
         except Exception as e:
             print(f"Attempt {attempt + 1} failed: {e}")
             if attempt == max_retries - 1:
                 raise
             time.sleep(1)
 
+def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, max_retries=3):
+    return load_data_direct(ticker, exchange, interval, nbars)
+    
 # def crawl(stock_infos, stock_list, output_dir, crawl_new, interval, crawl_source, args):
 
 #     if interval == "1hour":
