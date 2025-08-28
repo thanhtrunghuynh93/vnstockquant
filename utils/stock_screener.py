@@ -1,6 +1,7 @@
 from vnstock import *
 from crawler.stock_OHCLV_crawler import load_data_direct
 import pandas as pd
+import os
 
 def get_stock_metadata(exchange: str = "HOSE", limit: int = 1700) -> list:
     """
@@ -9,7 +10,13 @@ def get_stock_metadata(exchange: str = "HOSE", limit: int = 1700) -> list:
     The limit is set to 1700 to retrieve a comprehensive list of stocks.
     """
 
-    screener_df = Screener().stock(params={"exchangeName": exchange}, limit=limit)
+    csv_path = "data/{}.csv".format(exchange)
+    if os.path.exists(csv_path):
+        screener_df = pd.read_csv(csv_path, index_col=0)
+    else:
+        screener_df = Screener().stock(params={"exchangeName": exchange}, limit=limit)
+        screener_df.to_csv(csv_path, index=True)
+    
     stock_df = screener_df[["ticker", "market_cap"]]
     stock_df = stock_df.dropna()
     stock_df = stock_df.sort_values("market_cap", ascending=False)
