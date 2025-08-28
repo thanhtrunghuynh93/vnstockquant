@@ -41,7 +41,7 @@ def main():
             # Place your weekly task here            
         elif not is_trading_hour(now):
             stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
-            msg = f"[{time.strftime('%Y-%m-%d', now)}]\n Current weekly stock momentum list: {', '.join(stock_momentum_list)}"            
+            msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]\n Current weekly stock momentum list: {', '.join(stock_momentum_list)}"
             change = 0
 
             for stock in stock_momentum_list:
@@ -50,11 +50,11 @@ def main():
                 change += df['close'].pct_change().values[-1]*100
 
             msg += f"\nPortfolio: {change/len(stock_momentum_list):.2f}%"
-
             send_notification(msg)
-        else:
-            # Sleep for 30 seconds before checking again
             time.sleep(60)
+        else:
+            # Sleep for 5 seconds before checking again
+            time.sleep(5)
     
 
 if __name__ == "__main__":
