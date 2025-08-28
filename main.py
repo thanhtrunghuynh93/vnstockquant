@@ -5,7 +5,7 @@ import os, time
 import pandas as pd
 from strategies.TSMOM.strategy import calculate_momentum
 import numpy as np
-from crawler.stock_OHCLV_crawler import load_data_direct
+from crawler.stock_OHCLV_crawler import crawl_OHCLV
 
 def main():
     os.environ['TZ'] = 'Asia/Ho_Chi_Minh'
@@ -45,7 +45,7 @@ def main():
             change = 0
 
             for stock in stock_momentum_list:
-                df = load_data_direct(stock, interval="1W", exchange="HOSE", nbars=3)
+                df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
                 msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
                 change += df['close'].pct_change().values[-1]*100
 
@@ -56,7 +56,7 @@ def main():
             change = 0
 
             for stock in next_stock_momentum_list:
-                df = load_data_direct(stock, interval="1W", exchange="HOSE", nbars=3)
+                df = crawl_OHCLV(stock, interval="1W", exchange="HOSE", nbars=3)
                 msg += f"\n{stock}: {df['close'].values[-1]} ({df['close'].pct_change().values[-1]*100:.2f}%)"
                 change += df['close'].pct_change().values[-1]*100
 

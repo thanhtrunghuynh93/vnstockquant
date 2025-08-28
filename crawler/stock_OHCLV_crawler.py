@@ -42,42 +42,52 @@ def load_data_direct(ticker, exchange = "HOSE", interval = "1W", nbars = 5000):
     df["ticker"] = ticker
     return df
 
-def crawl(stock_infos, stock_list, output_dir, crawl_new, interval, crawl_source, args):
+def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            return load_data_direct(ticker, exchange, interval, nbars)
+        except Exception as e:
+            print(f"Attempt {attempt + 1} failed: {e}")
+            if attempt == max_retries - 1:
+                raise
+            time.sleep(1)
 
-    if interval == "1hour":
-        itv = Interval.in_1_hour
-    elif interval == "1day":
-        itv = Interval.in_daily
-    else:
-        print("Interval not support")
-        return
+# def crawl(stock_infos, stock_list, output_dir, crawl_new, interval, crawl_source, args):
 
-    if crawl_source == "tradingview":
-        crawler = TvDatafeed(args.username, args.password, chromedriver_path=args.driver_path)
-        crawl_range = args.nbars
-    elif crawl_source == "vnd":
-        crawler = VndCrawler()
-        crawl_range = args.start_date
-    else:
-        print("Crawl source not support")
-        return
+#     if interval == "1hour":
+#         itv = Interval.in_1_hour
+#     elif interval == "1day":
+#         itv = Interval.in_daily
+#     else:
+#         print("Interval not support")
+#         return
 
-    # stock_list.append("VNINDEX")
-    if interval == "1day":
-        crawl_by_day(stock_infos, stock_list, output_dir, crawl_new, crawl_source, crawl_range, crawler)
+#     if crawl_source == "tradingview":
+#         crawler = TvDatafeed(args.username, args.password, chromedriver_path=args.driver_path)
+#         crawl_range = args.nbars
+#     elif crawl_source == "vnd":
+#         crawler = VndCrawler()
+#         crawl_range = args.start_date
+#     else:
+#         print("Crawl source not support")
+#         return
 
-        #Crawl VNI
-        start_data_date = datetime.strptime("2017-02-01 09:00:00", '%Y-%m-%d %H:%M:%S')
-        start_data_date = int(start_data_date.timestamp())
-        vnd_crawler = VndCrawler()
-        vni_data = vnd_crawler.get_hist(resolution = "D", from_date = start_data_date)
-        vni_data["symbol"] = "HOSE:VNINDEX"
+#     # stock_list.append("VNINDEX")
+#     if interval == "1day":
+#         crawl_by_day(stock_infos, stock_list, output_dir, crawl_new, crawl_source, crawl_range, crawler)
 
-        vni_data.to_csv(output_dir + "/VNINDEX_1day.csv")       
+#         #Crawl VNI
+#         start_data_date = datetime.strptime("2017-02-01 09:00:00", '%Y-%m-%d %H:%M:%S')
+#         start_data_date = int(start_data_date.timestamp())
+#         vnd_crawler = VndCrawler()
+#         vni_data = vnd_crawler.get_hist(resolution = "D", from_date = start_data_date)
+#         vni_data["symbol"] = "HOSE:VNINDEX"
 
-    if interval == "1hour":
-        pass
-        # crawl_by_hour(crawler, stock_infos, stock_list, nbars, output_dir, crawl_new)
+#         vni_data.to_csv(output_dir + "/VNINDEX_1day.csv")       
+
+#     if interval == "1hour":
+#         pass
+#         # crawl_by_hour(crawler, stock_infos, stock_list, nbars, output_dir, crawl_new)
 
 
 # def crawl_by_hour(stock_infos, stock_list, nbars, output_dir, crawl_new = False, crawl_source, crawler, crawl_range):
