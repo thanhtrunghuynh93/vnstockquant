@@ -39,7 +39,7 @@ def main():
             send_notification(f"Weekly stock momentum list updated: {', '.join(stock_momentum_list)}")
             current_weekday = now.tm_wday                        
             # Place your weekly task here            
-        elif not is_trading_hour(now):
+        elif is_trading_hour(now):
             stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
             msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]\n Current weekly stock momentum list: {', '.join(stock_momentum_list)}"
             change = 0
