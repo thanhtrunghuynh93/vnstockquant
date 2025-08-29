@@ -40,7 +40,7 @@ def main():
             current_weekday = now.tm_wday                                    
         else:
             res = is_trading_hour(now)      
-            if res:  
+            if True:  
                 stock_momentum_list = np.loadtxt("data/momentum_list.txt", dtype=str)
                 msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', now)}]\n Current weekly momentum list: {', '.join(stock_momentum_list)}"
                 change = 0
