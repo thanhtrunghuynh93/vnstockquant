@@ -58,7 +58,10 @@ def crawl_OHCLV(ticker, exchange = "HOSE", interval = "1W", nbars = 5000, live =
         quote = Quote(symbol=ticker, source='VCI')
         last_price_raw = quote.intraday(page_size = 1)
         
-        if last_price_raw is not None:
+        if last_price_raw is not None and len(last_price_raw) > 0:
+            if "price" not in last_price_raw.columns or len(last_price_raw["price"].values) == 0:
+                print("No price data found")
+                return df
             last_price = last_price_raw["price"].values[-1] * 1000
             df.loc[df.index[-1], 'close'] = last_price
 
