@@ -17,27 +17,30 @@ def main():
     print("Waiting for the start of the day to retrieve stock metadata...")
     while True:
         now = time.localtime()
+
+        # New day check
         if now.tm_mday != current_day:
-            print(f"New day detected: {current_day}. Resetting stock metadata retrieval.")
+            print(f"New day detected: {now.tm_mday}. Resetting stock metadata retrieval.")
             stock_df = get_stock_metadata()
             print("Stock metadata retrieval completed.")
             current_day = now.tm_mday            
-        
-        # Detect start of a new week (Monday)
-        if current_weekday == -1 or (now.tm_wday == 0 and now.tm_wday != current_weekday):
-            print("New week detected. Performing weekly task...")
-            stock_df = pd.read_csv("data/stock_metadata.csv", index_col=0)
-            stock_list, stock_1w_data = filter_stocks(stock_df)
-            print(f"Filtered stocks: {stock_list}")
-            if current_weekday == -1:
-                stock_momentum_list = calculate_momentum(stock_1w_data, in_week=True)[:8]
-            else:
-                stock_momentum_list = calculate_momentum(stock_1w_data, in_week=False)[:8]
 
-            np.savetxt("data/momentum_list.txt", np.array(stock_momentum_list), fmt="%s")             
+            # Weekly check (run on Monday or first run)
+            if current_weekday == -1 or now.tm_wday == 0:
+                print("New week detected. Performing weekly task...")
 
-            send_notification(f"Weekly momentum list updated: {', '.join(stock_momentum_list)}")
-            current_weekday = now.tm_wday                                    
+                stock_df = pd.read_csv("data/stock_metadata.csv", index_col=0)
+                stock_list, stock_1w_data = filter_stocks(stock_df)
+                print(f"Filtered stocks: {stock_list}")
+
+                in_week = (current_weekday == -1)  # first run vs normal week
+                stock_momentum_list = calculate_momentum(stock_1w_data, in_week=in_week)[:8]
+
+                np.savetxt("data/momentum_list.txt", np.array(stock_momentum_list), fmt="%s")             
+                send_notification(f"Weekly momentum list updated: {', '.join(stock_momentum_list)}")
+
+            # Always update weekday at the end of the daily reset
+            current_weekday = now.tm_wday
         else:
             res = is_trading_hour(now)      
             if res:  
